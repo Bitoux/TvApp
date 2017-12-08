@@ -138,57 +138,49 @@ public class APIServices {
         AppSingleton.getInstance(this.mContext).addToRequestQueue(updatedSeries, REQUEST_TAG);
     }
 
-    public void getSeriesListView(int[] seriesIDs, final SeriesInterface seriesInterface){
-        ArrayList<Serie> seriesList = new ArrayList<Serie>();
-        for(int i = 0; i < seriesIDs.length ; i++){
-            String url = API_URL + "series/" + seriesIDs[i];
+    public void getSeriesListView(int serieID, final SeriesInterface callback){
 
-            JsonObjectRequest getSerieByID = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>(){
+        String url = API_URL + "series/" + serieID;
 
-                @Override
-                public void onResponse(JSONObject response) {
-                    System.out.println("THE SERIE");
-                    try {
-//                        private long id;
-//                        private String name;
-//                        private String[] genre;
-//                        private String overview;
-//                        private float rating;
-//                        private String banner;
-                        JSONObject data = response.getJSONObject("data");
-                        long id = data.getLong("id");
-                        String name = data.getString("seriesName");
-                        String overview = data.getString("overview");
-                        String rating = data.getString("siteRating");
-                        String banner = data.getString("banner");
-                        //String[] genre = data.getString("genre");
+        JsonObjectRequest getSerieByID = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>(){
 
-//                        Serie serie = new Serie(data.getLong("id"), );
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONObject data = response.getJSONObject("data");
+                    long id = data.getLong("id");
+                    String name = data.getString("seriesName");
+                    String overview = data.getString("overview");
+                    String rating = data.getString("siteRating");
+                    String banner = data.getString("banner");
+                    JSONArray genres = data.getJSONArray("genre");
+                    String[] genresArray = new String[genres.length()];
+                    for(int i = 0 ; i < genres.length() ; i ++){
+                        genresArray[i] = genres.getString(i);
                     }
+                    Serie serie = new Serie(id, name, genresArray, overview, rating, banner);
+                    callback.onSuccess(serie);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            }, new Response.ErrorListener() {
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                //Authorization: Bearer yourjwttoken
+                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+                String auth_token_string = settings.getString("TokenAPI", ""/*default value*/);
+                String auth = "Bearer " + auth_token_string;
+                headers.put("Authorization", auth);
+                return headers;
+            }
+        };
 
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                }
-            }) {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    HashMap<String, String> headers = new HashMap<String, String>();
-                    //Authorization: Bearer yourjwttoken
-                    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
-                    String auth_token_string = settings.getString("TokenAPI", ""/*default value*/);
-                    String auth = "Bearer " + auth_token_string;
-                    headers.put("Authorization", auth);
-                    return headers;
-                }
-            };
-
-            AppSingleton.getInstance(this.mContext).addToRequestQueue(getSerieByID, REQUEST_TAG);
-        }
+        AppSingleton.getInstance(this.mContext).addToRequestQueue(getSerieByID, REQUEST_TAG);
     }
 }

@@ -9,5 +9,5 @@ import java.util.ArrayList;
  */
 
 public interface SeriesInterface {
-    void onSuccess(ArrayList<Serie> series);
+    void onSuccess(Serie series);
 }

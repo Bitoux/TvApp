@@ -73,4 +73,16 @@ public class Serie {
     public String toString(){
         return "id: " + this.id + ", name: " + this.name + ", genre: " + this.genre + ", overview: " + this.overview + ", rating: " + this.rating + ", banner: " + this.banner;
     }
+
+    public String genreToString(){
+        String genreString = "";
+        for(int i=0; i<this.genre.length; i++){
+            if(i == 0){
+                genreString = this.genre[i];
+            }else{
+                genreString = genreString + ", " + this.genre[i];
+            }
+        }
+        return genreString;
+    }
 }
