@@ -1,8 +1,6 @@
 package com.example.root.tvapp.activity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -11,7 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.root.tvapp.R;
-import com.example.root.tvapp.interfaces.TokenInterface;
+import com.example.root.tvapp.interfaces.ITokenListener;
 import com.example.root.tvapp.service.APIServices;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     //GET TOKEN
                     APIServices apiServices = new APIServices(getApplicationContext());
-                    apiServices.authentificate("EFDC7A6838F30979", userkey.getText().toString(), username.getText().toString(), errorLog, errosText, new TokenInterface(){
+                    apiServices.authentificate("EFDC7A6838F30979", userkey.getText().toString(), username.getText().toString(), errorLog, errosText, new ITokenListener(){
                         @Override
                         public void onSuccess(String token) {
                             //REDIRECT HOME ACTIVITY

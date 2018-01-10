@@ -8,6 +8,6 @@ import java.util.ArrayList;
  * Created by root on 24/11/17.
  */
 
-public interface SeriesInterface {
-    void onSuccess(Serie series);
+public interface ISeriesListener {
+    void onSuccess(Serie serie);
 }

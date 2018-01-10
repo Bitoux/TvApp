@@ -11,9 +11,10 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.example.root.tvapp.interfaces.SeriesIdInterface;
-import com.example.root.tvapp.interfaces.SeriesInterface;
-import com.example.root.tvapp.interfaces.TokenInterface;
+import com.example.root.tvapp.interfaces.IBooleanListener;
+import com.example.root.tvapp.interfaces.ISeriesIdListener;
+import com.example.root.tvapp.interfaces.ISeriesListener;
+import com.example.root.tvapp.interfaces.ITokenListener;
 import com.example.root.tvapp.model.Serie;
 import com.example.root.tvapp.singleton.AppSingleton;
 
@@ -22,8 +23,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,7 +31,11 @@ import java.util.Map;
 
 public class APIServices {
 
+    // API SERVICE PAR MODEL
+
     public static final String API_URL = "https://api.thetvdb.com/";
+
+    public static final String IMG_URL = "https://www.thetvdb.com/banners/_cache/";
 
     final String  REQUEST_TAG = "com.androidtutorialpoint.volleyJsonArrayRequest";
 
@@ -42,7 +45,7 @@ public class APIServices {
         this.mContext = c;
     }
 
-    public void authentificate(String apikey, String userkey, String username, final TextView errorLog, final TextView errorRequired, final TokenInterface callback){
+    public void authentificate(String apikey, String userkey, String username, final TextView errorLog, final TextView errorRequired, final ITokenListener callback){
         String url = API_URL + "login";
 
         //PREPARE PARAMS
@@ -87,7 +90,7 @@ public class APIServices {
         AppSingleton.getInstance(this.mContext).addToRequestQueue(tokenRequest, REQUEST_TAG);
     }
 
-    public void getUpdateSeries(final SeriesIdInterface callback){
+    public void getUpdateSeries(final ISeriesIdListener callback){
 
 
         Date today = new Date();
@@ -138,7 +141,114 @@ public class APIServices {
         AppSingleton.getInstance(this.mContext).addToRequestQueue(updatedSeries, REQUEST_TAG);
     }
 
-    public void getSeriesListView(int serieID, final SeriesInterface callback){
+    public String getSerieBanner(String bannerURL) {
+        String url = IMG_URL + bannerURL;
+        return url;
+    }
+
+    public void getUserFavorites(final String serieID, final IBooleanListener callback) {
+        String url = API_URL + "user/favorites";
+
+        JsonObjectRequest getUserFavs = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>(){
+
+            @Override
+            public void onResponse(JSONObject response) {
+                try{
+                    JSONObject data = response.getJSONObject("data");
+                    JSONArray favorites = data.getJSONArray("favorites");
+                    System.out.println(favorites.toString());
+                    Boolean checkFavs = false;
+                    for(int i = 0 ; i < favorites.length() ; i++){
+                        if(favorites.getString(0).equals(serieID)){
+                            checkFavs = true;
+                        }
+                    }
+                    callback.onSuccess(checkFavs);
+                } catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener(){
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                //Authorization: Bearer yourjwttoken
+                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+                String auth_token_string = settings.getString("TokenAPI", ""/*default value*/);
+                String auth = "Bearer " + auth_token_string;
+                headers.put("Authorization", auth);
+                return headers;
+            }
+        };
+
+        AppSingleton.getInstance(this.mContext).addToRequestQueue(getUserFavs, REQUEST_TAG);
+    }
+
+    public void addFavToUser(int serieID, final IBooleanListener callback ) {
+        String url = API_URL + "user/favorites/" + serieID;
+
+        JsonObjectRequest addFavToUser = new JsonObjectRequest(Request.Method.PUT, url, null, new Response.Listener<JSONObject>(){
+
+            @Override
+            public void onResponse(JSONObject response) {
+                callback.onSuccess(true);
+            }
+        }, new Response.ErrorListener(){
+            @Override
+            public void onErrorResponse(VolleyError error){
+
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                //Authorization: Bearer yourjwttoken
+                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+                String auth_token_string = settings.getString("TokenAPI", ""/*default value*/);
+                String auth = "Bearer " + auth_token_string;
+                headers.put("Authorization", auth);
+                return headers;
+            }
+        };
+
+        AppSingleton.getInstance(this.mContext).addToRequestQueue(addFavToUser, REQUEST_TAG);
+    }
+
+    public void delFavToUser(int serieID, final IBooleanListener callback ) {
+        String url = API_URL + "user/favorites/" + serieID;
+
+        JsonObjectRequest delFavToUser = new JsonObjectRequest(Request.Method.DELETE, url, null, new Response.Listener<JSONObject>(){
+
+            @Override
+            public void onResponse(JSONObject response) {
+                callback.onSuccess(true);
+            }
+        }, new Response.ErrorListener(){
+            @Override
+            public void onErrorResponse(VolleyError error){
+
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                //Authorization: Bearer yourjwttoken
+                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+                String auth_token_string = settings.getString("TokenAPI", ""/*default value*/);
+                String auth = "Bearer " + auth_token_string;
+                headers.put("Authorization", auth);
+                return headers;
+            }
+        };
+
+        AppSingleton.getInstance(this.mContext).addToRequestQueue(delFavToUser, REQUEST_TAG);
+    }
+
+    public void getSerieById(int serieID, final ISeriesListener listener){
 
         String url = API_URL + "series/" + serieID;
 
@@ -159,7 +269,7 @@ public class APIServices {
                         genresArray[i] = genres.getString(i);
                     }
                     Serie serie = new Serie(id, name, genresArray, overview, rating, banner);
-                    callback.onSuccess(serie);
+                    listener.onSuccess(serie);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">TvApp</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="search_menu">Rechercher</string>
+    <string name="favs_menu">Mes favoris</string>
+    <string name="account_menu">Mon compte</string>
 </resources>
