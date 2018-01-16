@@ -1,39 +1,65 @@
 package com.example.root.tvapp.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.root.tvapp.R;
-import com.example.root.tvapp.interfaces.ITokenListener;
+import com.example.root.tvapp.interfaces.IStringListener;
 import com.example.root.tvapp.service.APIServices;
 
 public class MainActivity extends AppCompatActivity {
+
+    private EditText userName;
+    private Button authBtn;
+    private EditText userKey;
+    private TextView errorText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //GET VIEW ELEMENTS
-        Button btn = (Button) findViewById(R.id.go_btn);
-        final EditText username = (EditText) findViewById(R.id.username);
-        final EditText userkey = (EditText) findViewById(R.id.userkey);
-        final TextView errosText = (TextView) findViewById(R.id.errors);
-        final TextView errorLog = (TextView) findViewById(R.id.logerror);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String auth_token_string = settings.getString("TokenAPI", "");
 
-        btn.setOnClickListener(new View.OnClickListener() {
+        if(auth_token_string != null){
+            Log.d("MainActivity", "EVER AUTH");
+            APIServices apiServices = new APIServices(getApplicationContext());
+            apiServices.refreshToken( new IStringListener(){
+                @Override
+                public void onSuccess(String token) {
+                    //REDIRECT HOME ACTIVITY
+                    Intent myIntent = new Intent(MainActivity.this, HomeActivity.class);
+                    //myIntent.putExtra("key", value); //Optional parameters
+                    MainActivity.this.startActivity(myIntent);
+                }
+            });
+        }
+
+        Log.d("MainActivity", "NEVER AUTH");
+
+        //GET VIEW ELEMENTS
+        this.authBtn = (Button) findViewById(R.id.go_btn);
+        this.userName = (EditText) findViewById(R.id.username);
+        this.userKey = (EditText) findViewById(R.id.userkey);
+        this.errorText = (TextView) findViewById(R.id.errors);
+
+        authBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if((username.getText().toString().matches("")) || (userkey.getText().toString().matches(""))){
-                    errosText.setVisibility(View.VISIBLE);
+                if((userName.getText().toString().matches("")) || (userKey.getText().toString().matches(""))){
+                    errorText.setVisibility(View.VISIBLE);
                 }else{
                     //GET TOKEN
                     APIServices apiServices = new APIServices(getApplicationContext());
-                    apiServices.authentificate("EFDC7A6838F30979", userkey.getText().toString(), username.getText().toString(), errorLog, errosText, new ITokenListener(){
+                    apiServices.authentificate(userKey.getText().toString(), userName.getText().toString(), new IStringListener(){
                         @Override
                         public void onSuccess(String token) {
                             //REDIRECT HOME ACTIVITY

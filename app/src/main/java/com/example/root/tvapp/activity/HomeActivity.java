@@ -1,6 +1,5 @@
 package com.example.root.tvapp.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -13,21 +12,13 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.ArrayAdapter;
 
 import com.example.root.tvapp.R;
-import com.example.root.tvapp.adapter.SerieAdapter;
-import com.example.root.tvapp.fragment.FeedFragment;
-import com.example.root.tvapp.fragment.GalleryFragment;
-import com.example.root.tvapp.interfaces.ISeriesIdListener;
-import com.example.root.tvapp.interfaces.ISeriesListener;
-import com.example.root.tvapp.model.Serie;
-import com.example.root.tvapp.service.APIServices;
+import com.example.root.tvapp.fragment.FavoritesFragment;
+import com.example.root.tvapp.fragment.ProfilFragment;
+import com.example.root.tvapp.fragment.UpdateFragment;
+import com.example.root.tvapp.fragment.SearchFragment;
 
-import java.util.ArrayList;
 
 /**
  * Created by root on 23/11/17.
@@ -35,12 +26,7 @@ import java.util.ArrayList;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private String[] mPlanetTitles;
-    private ListView mDrawerList;
-    private DrawerLayout mDrawerLayout;
-    private ArrayAdapter<String> mAdapter;
-    private ActionBarDrawerToggle mDrawerToggle;
-    private String mActivityTitle;
+
 
 
     @Override
@@ -62,7 +48,7 @@ public class HomeActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         if (savedInstanceState == null) {
-            showFragment(new FeedFragment());
+            showFragment(new UpdateFragment());
         }
     }
 
@@ -82,11 +68,17 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.nav_feed:
-                showFragment(new FeedFragment());
+            case R.id.nav_update:
+                showFragment(new UpdateFragment());
                 break;
-            case R.id.nav_gallery:
-                showFragment(new GalleryFragment());
+            case R.id.nav_search:
+                showFragment(new SearchFragment());
+                break;
+            case R.id.nav_favs:
+                showFragment(new FavoritesFragment());
+                break;
+            case R.id.nav_profile:
+                showFragment(new ProfilFragment());
                 break;
             default:
                 return false;

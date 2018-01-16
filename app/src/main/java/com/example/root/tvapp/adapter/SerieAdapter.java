@@ -1,6 +1,7 @@
 package com.example.root.tvapp.adapter;
 
 import android.content.Context;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,8 +10,6 @@ import android.widget.TextView;
 
 import com.example.root.tvapp.R;
 import com.example.root.tvapp.model.Serie;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -36,13 +35,25 @@ public class SerieAdapter extends ArrayAdapter<Serie> {
                     .inflate(R.layout.serie_list, parent, false);
         }
 
-        TextView serieName = (TextView) convertView.findViewById(R.id.serieName);
-        TextView serieRating = (TextView) convertView.findViewById(R.id.serieRating);
-        TextView serieGenre = (TextView) convertView.findViewById(R.id.serieGenre);
+        TextView serieName = (TextView) convertView.findViewById(R.id.serie_name);
+        TextView serieRating = (TextView) convertView.findViewById(R.id.serie_rating);
+        TextView serieGenre = (TextView) convertView.findViewById(R.id.serie_genre);
 
-        serieName.setText(item.getName());
-        serieRating.setText(item.getRating());
-        serieGenre.setText(item.genreToString());
+        if(item.getRating() == null && item.getGenre() == null){
+            serieGenre.setVisibility(View.INVISIBLE);
+            serieGenre.setHeight(0);
+            serieRating.setVisibility(View.INVISIBLE);
+            serieRating.setHeight(0);
+            serieName.setText(item.getName());
+            serieName.setGravity(Gravity.CENTER);
+            serieName.setHeight(100);
+        }else{
+            serieName.setText(item.getName());
+            serieRating.setText(item.getRating());
+            serieGenre.setText(item.genreToString());
+        }
+
+
 
         return convertView;
     }

@@ -6,6 +6,6 @@ import org.json.JSONObject;
  * Created by root on 24/11/17.
  */
 
-public interface ITokenListener {
+public interface IStringListener {
     void onSuccess(String token);
 }
