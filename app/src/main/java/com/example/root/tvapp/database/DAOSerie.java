@@ -20,9 +20,6 @@ public class DAOSerie extends DAOBase {
     public static final String serieBanner="SerieBanner";
     public static final String serieGenre="SerieGenre";
 
-    public static final String TABLE_CREATE = "CREATE TABLE "+serieTable+" ("+serieId+ " INTEGER PRIMARY KEY , "+
-        serieName+ " TEXT, " + serieOverview + " TEXT, " + serieRating + " TEXT, " + serieBanner + " TEXT);";
-
     public static final String TABLE_DROP =  "DROP TABLE IF EXISTS " + serieTable + ";";
 
     public DAOSerie(Context context){

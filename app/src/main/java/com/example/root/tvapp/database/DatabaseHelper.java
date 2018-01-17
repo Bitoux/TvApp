@@ -13,13 +13,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     static final String dbName="AppTVDB";
 
     //SERIES
-    public static final String serieTable="SerieTable";
-    public static final String serieId="SerieID";
-    public static final String serieName="SerieName";
-    public static final String serieOverview="SerieOverview";
-    public static final String serieRating="SerieRating";
-    public static final String serieBanner="SerieBanner";
-    public static final String serieGenre="SerieGenre";
+    static final String serieTable="SerieTable";
+    static final String serieId="SerieID";
+    static final String serieName="SerieName";
+    static final String serieOverview="SerieOverview";
+    static final String serieRating="SerieRating";
+    static final String serieBanner="SerieBanner";
+    static final String serieGenre="SerieGenre";
 
     //ACTOR
     static final String actorTable="ActorTable";
@@ -44,7 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
         sqLiteDatabase.execSQL("CREATE TABLE "+serieTable+" ("+serieId+ " INTEGER PRIMARY KEY , "+
-                serieName+ " TEXT, " + serieOverview + " TEXT, " + serieRating + " TEXT, " + serieBanner + " TEXT);");
+                serieName+ " TEXT, " + serieOverview + " TEXT, "  + serieRating + " TEXT, "  + serieGenre + " TEXT, " + serieBanner + " TEXT);");
 
 
         sqLiteDatabase.execSQL("CREATE TABLE " + actorTable + " (" + actorId + " INTEGER PRIMARY KEY , " +

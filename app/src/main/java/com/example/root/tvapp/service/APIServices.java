@@ -200,7 +200,8 @@ public class APIServices {
                     Actor[] actors = new Actor[data.length()];
                     for(int i = 0; i < data.length(); i++){
                         JSONObject tmpActor = data.getJSONObject(i);
-                        //actors[i] = new Actor(tmpActor.getInt("id"), tmpActor.getString("image"), tmpActor.getString("name"), tmpActor.getString("role"));
+                        actors[i] = new Actor(tmpActor.getInt("id"), tmpActor.getString("image"), tmpActor.getString("name"), tmpActor.getString("role"), tmpActor.getInt("seriesId"));
+                        if()
                     }
                     callback.onSuccess(actors);
                 } catch (JSONException e){
@@ -478,6 +479,9 @@ public class APIServices {
                     Serie serie = new Serie(id, name, genreString, overview, rating, banner);
                     if(daoSerie.selectSerie(id.intValue()) == null){
                         Log.d("Not IN DB", "NOT IN DV");
+                        daoSerie.addSerie(serie);
+                    }else{
+                        Log.d("IN DB", "IN DB");
                     }
                     listener.onSuccess(serie);
                 } catch (JSONException e) {
