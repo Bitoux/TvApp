@@ -74,7 +74,7 @@ public class SerieActivity extends AppCompatActivity {
                     new DownloadImageTask(banner).execute(apiServices.getSerieBanner(serie.getBanner()));
                     serieName.setText(serie.getName());
                     serieOverview.setText(serie.getOverview());
-                    serieGenre.setText(serie.genreToString());
+                    serieGenre.setText(serie.getGenre());
                     serieRating.setText(serie.getRating());
 
                     apiServices.checkUserFavorites(String.valueOf(serie.getId()), new IBooleanListener() {

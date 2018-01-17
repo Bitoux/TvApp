@@ -13,10 +13,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     static final String dbName="AppTVDB";
 
     //SERIES
-
+    public static final String serieTable="SerieTable";
+    public static final String serieId="SerieID";
+    public static final String serieName="SerieName";
+    public static final String serieOverview="SerieOverview";
+    public static final String serieRating="SerieRating";
+    public static final String serieBanner="SerieBanner";
+    public static final String serieGenre="SerieGenre";
 
     //ACTOR
-    static final String actorTable="actorTable";
+    static final String actorTable="ActorTable";
     static final String actorId="ActorID";
     static final String actorName="ActorName";
     static final String actorImg="ActorImg";
@@ -24,7 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     static final String actorSerie="ActorSerie";
 
     //USER
-    static final String userTable="userTable";
+    static final String userTable="UserTable";
     static final String userId="UserID";
     static final String userName="UserName";
     static final String userLanguage="UserLanguage";
@@ -37,12 +43,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
+        sqLiteDatabase.execSQL("CREATE TABLE "+serieTable+" ("+serieId+ " INTEGER PRIMARY KEY , "+
+                serieName+ " TEXT, " + serieOverview + " TEXT, " + serieRating + " TEXT, " + serieBanner + " TEXT);");
+
 
         sqLiteDatabase.execSQL("CREATE TABLE " + actorTable + " (" + actorId + " INTEGER PRIMARY KEY , " +
             actorName + " TEXT, " + actorImg + " TEXT, " + actorRole + " TEXT, " + actorSerie + " INTEGER);" );
 
         sqLiteDatabase.execSQL("CREATE TABLE " + userTable + " (" + userId + " INTEGER PRIMARY KEY ,"+
-            userId + " TEXT, " + userName + " TEXT, " + userLanguage + ", TEXT " + userDisplayMode + " TEXT);" );
+                userName + " TEXT, " + userLanguage + ", TEXT " + userDisplayMode + " TEXT);" );
     }
 
     @Override

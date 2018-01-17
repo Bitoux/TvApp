@@ -10,6 +10,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.example.root.tvapp.database.DAOSerie;
 import com.example.root.tvapp.interfaces.IActorArrayListener;
 import com.example.root.tvapp.interfaces.IBooleanListener;
 import com.example.root.tvapp.interfaces.ISeriesArrayListener;
@@ -199,7 +200,7 @@ public class APIServices {
                     Actor[] actors = new Actor[data.length()];
                     for(int i = 0; i < data.length(); i++){
                         JSONObject tmpActor = data.getJSONObject(i);
-                        actors[i] = new Actor(tmpActor.getInt("id"), tmpActor.getString("image"), tmpActor.getString("name"), tmpActor.getString("role"));
+                        //actors[i] = new Actor(tmpActor.getInt("id"), tmpActor.getString("image"), tmpActor.getString("name"), tmpActor.getString("role"));
                     }
                     callback.onSuccess(actors);
                 } catch (JSONException e){
@@ -457,18 +458,27 @@ public class APIServices {
             @Override
             public void onResponse(JSONObject response) {
                 try {
+                    DAOSerie daoSerie = new DAOSerie(mContext);
+                    daoSerie.open();
                     JSONObject data = response.getJSONObject("data");
-                    long id = data.getLong("id");
+                    Long id = data.getLong("id");
                     String name = data.getString("seriesName");
                     String overview = data.getString("overview");
                     String rating = data.getString("siteRating");
                     String banner = data.getString("banner");
                     JSONArray genres = data.getJSONArray("genre");
-                    String[] genresArray = new String[genres.length()];
+                    String genreString = "";
                     for(int i = 0 ; i < genres.length() ; i ++){
-                        genresArray[i] = genres.getString(i);
+                        if(i==0){
+                            genreString = genres.getString(i);
+                        }else{
+                            genreString = genreString + ", " + genres.getString(i);
+                        }
                     }
-                    Serie serie = new Serie(id, name, genresArray, overview, rating, banner);
+                    Serie serie = new Serie(id, name, genreString, overview, rating, banner);
+                    if(daoSerie.selectSerie(id.intValue()) == null){
+                        Log.d("Not IN DB", "NOT IN DV");
+                    }
                     listener.onSuccess(serie);
                 } catch (JSONException e) {
                     e.printStackTrace();

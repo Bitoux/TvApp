@@ -7,12 +7,12 @@ package com.example.root.tvapp.model;
 public class Serie {
     private long id;
     private String name;
-    private String[] genre;
+    private String genre;
     private String overview;
     private String rating;
     private String banner;
 
-    public Serie(long id, String name, String[] genre, String overview, String rating, String banner){
+    public Serie(long id, String name, String genre, String overview, String rating, String banner){
         this.id = id;
         this.name = name;
         this.genre = genre;
@@ -37,11 +37,11 @@ public class Serie {
         this.name = name;
     }
 
-    public String[] getGenre() {
+    public String getGenre() {
         return genre;
     }
 
-    public void setGenre(String[] genre) {
+    public void setGenre(String genre) {
         this.genre = genre;
     }
 
@@ -74,15 +74,4 @@ public class Serie {
         return "id: " + this.id + ", name: " + this.name + ", genre: " + this.genre + ", overview: " + this.overview + ", rating: " + this.rating + ", banner: " + this.banner;
     }
 
-    public String genreToString(){
-        String genreString = "";
-        for(int i=0; i<this.genre.length; i++){
-            if(i == 0){
-                genreString = this.genre[i];
-            }else{
-                genreString = genreString + ", " + this.genre[i];
-            }
-        }
-        return genreString;
-    }
 }

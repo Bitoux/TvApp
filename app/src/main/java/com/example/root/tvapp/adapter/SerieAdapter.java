@@ -50,7 +50,7 @@ public class SerieAdapter extends ArrayAdapter<Serie> {
         }else{
             serieName.setText(item.getName());
             serieRating.setText(item.getRating());
-            serieGenre.setText(item.genreToString());
+            serieGenre.setText(item.getGenre());
         }
 
 

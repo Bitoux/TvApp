@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 public abstract class DAOBase {
     protected final static int VERSION = 1;
-    protected final static String NOM = "database.db";
+    protected final static String NOM = "AppTVDB";
 
     protected SQLiteDatabase mDB = null;
     protected DatabaseHelper mHandler = null;

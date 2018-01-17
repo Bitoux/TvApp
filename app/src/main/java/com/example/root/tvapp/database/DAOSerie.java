@@ -2,6 +2,7 @@ package com.example.root.tvapp.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 
 import com.example.root.tvapp.model.Serie;
 
@@ -34,7 +35,7 @@ public class DAOSerie extends DAOBase {
         value.put(DAOSerie.serieId, id.intValue());
         value.put(DAOSerie.serieName, s.getName());
         value.put(DAOSerie.serieBanner, s.getBanner());
-        value.put(DAOSerie.serieGenre, s.genreToString());
+        value.put(DAOSerie.serieGenre, s.getGenre());
         value.put(DAOSerie.serieRating, s.getRating());
         value.put(DAOSerie.serieOverview, s.getOverview());
         mDB.insert(DAOSerie.serieTable, null, value);
@@ -48,14 +49,30 @@ public class DAOSerie extends DAOBase {
         ContentValues value = new ContentValues();
         value.put(DAOSerie.serieName, s.getName());
         value.put(DAOSerie.serieBanner, s.getBanner());
-        value.put(DAOSerie.serieGenre, s.genreToString());
+        value.put(DAOSerie.serieGenre, s.getGenre());
         value.put(DAOSerie.serieRating, s.getRating());
         value.put(DAOSerie.serieOverview, s.getOverview());
-        mDB.update(DAOSerie.serieTable, value, serieId  + " = ?", new String[] {String.valueOf(m.getId())});
+        mDB.update(DAOSerie.serieTable, value, serieId  + " = ?", new String[] {String.valueOf(s.getId())});
     }
 
-    public void selectSerie(int serieId){
-
+    public Serie selectSerie(int serieId){
+        Cursor cursor = null;
+        Serie serie = null;
+        cursor  = mDB.rawQuery("SELECT * FROM " + serieTable + " WHERE " + DAOSerie.serieId + " = " + serieId, null);
+        if(cursor != null){
+            if(cursor.moveToFirst()){
+                serie = new Serie(
+                        cursor.getInt(cursor.getColumnIndex(DAOSerie.serieId)),
+                        cursor.getString(cursor.getColumnIndex(DAOSerie.serieName)),
+                        cursor.getString(cursor.getColumnIndex(DAOSerie.serieGenre)),
+                        cursor.getString(cursor.getColumnIndex(DAOSerie.serieOverview)),
+                        cursor.getString(cursor.getColumnIndex(DAOSerie.serieRating)),
+                        cursor.getString(cursor.getColumnIndex(DAOSerie.serieBanner))
+                );
+            }
+            cursor.close();
+        }
+        return serie;
     }
 
 }
