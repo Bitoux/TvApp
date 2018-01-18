@@ -3,8 +3,11 @@ package com.example.root.tvapp.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 import com.example.root.tvapp.model.Actor;
+
+import java.util.ArrayList;
 
 /**
  * Created by root on 18/01/18.
@@ -56,5 +59,27 @@ public class DAOActor extends DAOBase {
             cursor.close();
         }
         return actor;
+    }
+
+    public ArrayList<Actor> getSerieActors(int serieID){
+        Cursor cursor = null;
+        ArrayList<Actor> actors = new ArrayList<Actor>();
+        cursor = mDB.rawQuery("SELECT * FROM " + actorTable + " WHERE " + DAOActor.actorSerie + " = " + serieID, null);
+        if(cursor != null){
+            Log.d("ACTORS IN DB", "CURSOR NOT NULL");
+            while (cursor.moveToNext()){
+                Actor actor = new Actor(
+                        cursor.getInt(cursor.getColumnIndex(DAOActor.actorId)),
+                        cursor.getString(cursor.getColumnIndex(DAOActor.actorImg)),
+                        cursor.getString(cursor.getColumnIndex(DAOActor.actorName)),
+                        cursor.getString(cursor.getColumnIndex(DAOActor.actorRole)),
+                        cursor.getInt(cursor.getColumnIndex(DAOActor.actorSerie))
+                );
+                Log.d("ACTOR IN DB", actor.toString());
+                actors.add(actor);
+            }
+            cursor.close();
+        }
+        return actors;
     }
 }

@@ -25,7 +25,7 @@
             android:layout_marginBottom="38dp" />
 
         <CheckBox
-            android:id="@+id/savetoekn"
+            android:id="@+id/save_token"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Mémoriser"
@@ -68,7 +68,7 @@
             android:text="Se connecter"
             tools:layout_editor_absoluteX="130dp"
             tools:layout_editor_absoluteY="380dp"
-            android:layout_below="@+id/savetoekn"
+            android:layout_below="@+id/save_token"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="49dp" />
 
@@ -85,6 +85,15 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="38dp" />
+
+        <TextView
+            android:id="@+id/error_offilne"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:text="Vérifier votre connextion internet pour vous connecter"
+            android:visibility="invisible" />
 
         <TextView
             android:id="@+id/logerror"

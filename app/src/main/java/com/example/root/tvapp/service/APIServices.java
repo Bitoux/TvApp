@@ -10,6 +10,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.example.root.tvapp.database.DAOActor;
 import com.example.root.tvapp.database.DAOSerie;
 import com.example.root.tvapp.interfaces.IActorArrayListener;
 import com.example.root.tvapp.interfaces.IBooleanListener;
@@ -52,7 +53,7 @@ public class APIServices {
         this.mContext = c;
     }
 
-    public void authentificate( String userkey, String username, final IStringListener callback){
+    public void authentificate(final boolean memorise, String userkey, String username, final IStringListener callback){
         String url = API_URL + "login";
 
         //PREPARE PARAMS
@@ -67,10 +68,12 @@ public class APIServices {
             public void onResponse(JSONObject response) {
                 // the response is already constructed as a JSONObject!
                 try {
-                    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
-                    SharedPreferences.Editor editor = settings.edit();
-                    editor.putString("TokenAPI", response.getString("token"));
-                    editor.commit();
+                    if(memorise){
+                        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString("TokenAPI", response.getString("token"));
+                        editor.commit();
+                    }
                     callback.onSuccess(response.getString("token"));
 
                 } catch (JSONException e) {
@@ -198,10 +201,18 @@ public class APIServices {
                 try{
                     JSONArray data = response.getJSONArray("data");
                     Actor[] actors = new Actor[data.length()];
+                    DAOActor daoActor = new DAOActor(mContext);
+                    daoActor.open();
                     for(int i = 0; i < data.length(); i++){
                         JSONObject tmpActor = data.getJSONObject(i);
-                        actors[i] = new Actor(tmpActor.getInt("id"), tmpActor.getString("image"), tmpActor.getString("name"), tmpActor.getString("role"), tmpActor.getInt("seriesId"));
-                        if()
+                        Actor actor = new Actor(tmpActor.getInt("id"), tmpActor.getString("image"), tmpActor.getString("name"), tmpActor.getString("role"), tmpActor.getInt("seriesId"));
+                        actors[i] = actor;
+                        if(daoActor.selectActor(tmpActor.getInt("id")) == null){
+                            Log.d("NOT IN DB", "NOT IN DB");
+                            daoActor.addActor(actor);
+                        }else{
+                            Log.d("IN DB", "IN DB");
+                        }
                     }
                     callback.onSuccess(actors);
                 } catch (JSONException e){

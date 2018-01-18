@@ -1,5 +1,8 @@
 package com.example.root.tvapp.activity;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,6 +15,8 @@ import android.widget.TextView;
 
 import com.example.root.tvapp.R;
 import com.example.root.tvapp.adapter.ActorAdapter;
+import com.example.root.tvapp.database.DAOActor;
+import com.example.root.tvapp.database.DAOSerie;
 import com.example.root.tvapp.interfaces.IActorArrayListener;
 import com.example.root.tvapp.interfaces.IBooleanListener;
 import com.example.root.tvapp.interfaces.ISeriesListener;
@@ -29,6 +34,15 @@ import java.util.ArrayList;
 public class SerieActivity extends AppCompatActivity {
 
     private APIServices apiServices;
+    private Button addFav;
+    private Button delFav;
+    private TextView serieName;
+    private TextView serieOverview;
+    private TextView serieGenre;
+    private TextView serieRating;
+    private ImageView banner;
+    private ListView actorList;
+
 
     public APIServices getApiServices() {
         if(apiServices == null){
@@ -50,61 +64,82 @@ public class SerieActivity extends AppCompatActivity {
 
 
         // METTRE EN VAR
-        final Button addFav = (Button) findViewById(R.id.add_fav_btn);
-        final Button delFav = (Button) findViewById(R.id.del_fav);
-        addFav.setVisibility(View.INVISIBLE);
-        delFav.setVisibility(View.INVISIBLE);
+        this.addFav = (Button) findViewById(R.id.add_fav_btn);
+        this.delFav = (Button) findViewById(R.id.del_fav);
+        this.addFav.setVisibility(View.INVISIBLE);
+        this.delFav.setVisibility(View.INVISIBLE);
 
 
-        final TextView serieName = (TextView) findViewById(R.id.serie_name);
-        final TextView serieOverview = (TextView) findViewById(R.id.serie_overview);
-        final TextView serieGenre = (TextView) findViewById(R.id.serie_genre);
-        final TextView serieRating = (TextView) findViewById(R.id.serie_rating);
-        final ImageView banner = (ImageView) findViewById(R.id.banner);
-        final ListView actorList = (ListView) findViewById(R.id.actor_list);
+        this.serieName = (TextView) findViewById(R.id.serie_name);
+        this.serieOverview = (TextView) findViewById(R.id.serie_overview);
+        this.serieGenre = (TextView) findViewById(R.id.serie_genre);
+        this.serieRating = (TextView) findViewById(R.id.serie_rating);
+        this.banner = (ImageView) findViewById(R.id.banner);
+        this.actorList = (ListView) findViewById(R.id.actor_list);
         final Long serieIdLong = getIntent().getLongExtra("serieId", 0);
         if(serieIdLong != 0){
-            // METTRE API SERV EN VAR
-            final APIServices apiServices = new APIServices(getApplicationContext());
-            apiServices.getSerieById(serieIdLong.intValue(), new ISeriesListener() {
-                @Override
-                public void onSuccess(Serie serie) {
-                    // GET IMAGE BANNER ASYNCH
-                    // METTRE LOG
-                    new DownloadImageTask(banner).execute(apiServices.getSerieBanner(serie.getBanner()));
-                    serieName.setText(serie.getName());
-                    serieOverview.setText(serie.getOverview());
-                    serieGenre.setText(serie.getGenre());
-                    serieRating.setText(serie.getRating());
+            if(isOnline()){
+                // METTRE API SERV EN VAR
+                this.apiServices = new APIServices(getApplicationContext());
+                this.apiServices.getSerieById(serieIdLong.intValue(), new ISeriesListener() {
+                    @Override
+                    public void onSuccess(Serie serie) {
+                        // GET IMAGE BANNER ASYNCH
+                        // METTRE LOG
+                        new DownloadImageTask(banner).execute(apiServices.getSerieBanner(serie.getBanner()));
+                        serieName.setText(serie.getName());
+                        serieOverview.setText(serie.getOverview());
+                        serieGenre.setText(serie.getGenre());
+                        serieRating.setText(serie.getRating());
 
-                    apiServices.checkUserFavorites(String.valueOf(serie.getId()), new IBooleanListener() {
-                        @Override
-                        public void onSuccess(Boolean result) {
-                            if(result){
-                                addFav.setVisibility(View.INVISIBLE);
-                                delFav.setVisibility(View.VISIBLE);
-                            }else{
-                                addFav.setVisibility(View.VISIBLE);
-                                delFav.setVisibility(View.INVISIBLE);
+                        apiServices.checkUserFavorites(String.valueOf(serie.getId()), new IBooleanListener() {
+                            @Override
+                            public void onSuccess(Boolean result) {
+                                if(result){
+                                    addFav.setVisibility(View.INVISIBLE);
+                                    delFav.setVisibility(View.VISIBLE);
+                                }else{
+                                    addFav.setVisibility(View.VISIBLE);
+                                    delFav.setVisibility(View.INVISIBLE);
+                                }
                             }
-                        }
-                    });
+                        });
 
-                    apiServices.getSerieActors(serieIdLong.intValue(), new IActorArrayListener() {
-                        @Override
-                        public void onSuccess(Actor[] actors) {
-                            final ArrayList<Actor> actorArrayList = new ArrayList<Actor>();
-                            for(int i = 0 ; i < actors.length ; i++){
-                                Log.d("Actors", actors[i].toString());
-                                actorArrayList.add(actors[i]);
+                        apiServices.getSerieActors(serieIdLong.intValue(), new IActorArrayListener() {
+                            @Override
+                            public void onSuccess(Actor[] actors) {
+                                final ArrayList<Actor> actorArrayList = new ArrayList<Actor>();
+                                for(int i = 0 ; i < actors.length ; i++){
+                                    Log.d("Actors", actors[i].toString());
+                                    actorArrayList.add(actors[i]);
+                                }
+                                ActorAdapter adapter = new ActorAdapter(getApplicationContext(), actorArrayList);
+
+                                actorList.setAdapter(adapter);
                             }
-                            ActorAdapter adapter = new ActorAdapter(getApplicationContext(), actorArrayList);
+                        });
+                    }
+                });
+            }else{
+                DAOSerie daoSerie = new DAOSerie(getApplicationContext());
+                daoSerie.open();
+                Serie serie = daoSerie.selectSerie(serieIdLong.intValue());
+                serieName.setText(serie.getName());
+                serieOverview.setText(serie.getOverview());
+                serieGenre.setText(serie.getGenre());
+                serieRating.setText(serie.getRating());
+                addFav.setVisibility(View.INVISIBLE);
+                delFav.setVisibility(View.INVISIBLE);
 
-                            actorList.setAdapter(adapter);
-                        }
-                    });
-                }
-            });
+                Log.d("ACTORS", "ACTORS");
+
+                DAOActor daoActor = new DAOActor(getApplicationContext());
+                daoActor.open();
+                ArrayList<Actor> actors = daoActor.getSerieActors(serieIdLong.intValue());
+                ActorAdapter adapter = new ActorAdapter(getApplicationContext(), actors);
+                actorList.setAdapter(adapter);
+
+            }
         }
 
         addFav.setOnClickListener(new View.OnClickListener() {
@@ -148,6 +183,13 @@ public class SerieActivity extends AppCompatActivity {
             setSupportActionBar(toolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
     }
 
 

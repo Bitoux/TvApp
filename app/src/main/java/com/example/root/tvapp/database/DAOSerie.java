@@ -72,4 +72,27 @@ public class DAOSerie extends DAOBase {
         return serie;
     }
 
+    public Serie[] getLastSeries(){
+        Cursor cursor = null;
+        Serie[] series = new Serie[20];
+        cursor = mDB.rawQuery("SELECT * FROM " + serieTable + " ORDER BY " + serieId + " DESC LIMIT 20;", null);
+        if(cursor != null){
+            int i = 0;
+            while(cursor.moveToNext()){
+                Serie serie = new Serie(
+                        cursor.getInt(cursor.getColumnIndex(DAOSerie.serieId)),
+                        cursor.getString(cursor.getColumnIndex(DAOSerie.serieName)),
+                        cursor.getString(cursor.getColumnIndex(DAOSerie.serieGenre)),
+                        cursor.getString(cursor.getColumnIndex(DAOSerie.serieOverview)),
+                        cursor.getString(cursor.getColumnIndex(DAOSerie.serieRating)),
+                        cursor.getString(cursor.getColumnIndex(DAOSerie.serieBanner))
+                );
+                series[i] = serie;
+                i++;
+            }
+            cursor.close();
+        }
+        return series;
+    }
+
 }
