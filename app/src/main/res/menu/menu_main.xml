@@ -7,16 +7,20 @@
     <group
         android:checkableBehavior="single">
         <item
+            android:icon="@drawable/ic_autorenew_black_24dp"
             android:id="@+id/nav_update"
             android:checked="true"
             android:title="Series"/>
         <item
+            android:icon="@drawable/ic_magnify_black_24dp"
             android:id="@+id/nav_search"
             android:title="Recherche"/>
         <item
+            android:icon="@drawable/ic_star_black_24dp"
             android:id="@+id/nav_favs"
             android:title="Mes favoris"/>
         <item
+            android:icon="@drawable/ic_account_black_24dp"
             android:id="@+id/nav_profile"
             android:title="Mon profile"/>
     </group>

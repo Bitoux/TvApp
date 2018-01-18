@@ -75,7 +75,7 @@ public class DAOSerie extends DAOBase {
     public Serie[] getLastSeries(){
         Cursor cursor = null;
         Serie[] series = new Serie[20];
-        cursor = mDB.rawQuery("SELECT * FROM " + serieTable + " ORDER BY " + serieId + " DESC LIMIT 20;", null);
+        cursor = mDB.rawQuery("SELECT * FROM " + serieTable + " DESC LIMIT 20;", null);
         if(cursor != null){
             int i = 0;
             while(cursor.moveToNext()){

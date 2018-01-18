@@ -50,7 +50,7 @@ public class UpdateFragment extends Fragment {
                 @Override
                 public void onSuccess(int[] seriesIDs) {
                     final ArrayList<Serie> seriesList = new ArrayList<Serie>();
-                    for(int i = 0; i < 20 ; i++){
+                    for(int i = 0; i < 10 ; i++){
                         apiServices.getSerieById(seriesIDs[i], new ISeriesListener() {
                             @Override
                             public void onSuccess(Serie serie) {
