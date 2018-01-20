@@ -6,6 +6,8 @@ import android.database.Cursor;
 
 import com.example.root.tvapp.model.Serie;
 
+import java.util.ArrayList;
+
 /**
  * Created by root on 16/01/18.
  */
@@ -72,10 +74,10 @@ public class DAOSerie extends DAOBase {
         return serie;
     }
 
-    public Serie[] getLastSeries(){
+    public Serie[] getLastSeries(int limit){
         Cursor cursor = null;
-        Serie[] series = new Serie[20];
-        cursor = mDB.rawQuery("SELECT * FROM " + serieTable + " DESC LIMIT 20;", null);
+        Serie[] series = new Serie[limit];
+        cursor = mDB.rawQuery("SELECT * FROM " + serieTable + " DESC LIMIT " + limit +";", null);
         if(cursor != null){
             int i = 0;
             while(cursor.moveToNext()){
@@ -89,6 +91,27 @@ public class DAOSerie extends DAOBase {
                 );
                 series[i] = serie;
                 i++;
+            }
+            cursor.close();
+        }
+        return series;
+    }
+
+    public ArrayList<Serie> searhSerieByName(String name){
+        Cursor cursor = null;
+        ArrayList<Serie> series = new ArrayList<Serie>();
+        cursor = mDB.rawQuery("SELECT * FROM " + DAOSerie.serieTable + " WHERE " + DAOSerie.serieName + " LIKE '%"+ name +"%'", null);
+        if(cursor != null){
+            while (cursor.moveToNext()){
+                Serie serie = new Serie(
+                        cursor.getInt(cursor.getColumnIndex(DAOSerie.serieId)),
+                        cursor.getString(cursor.getColumnIndex(DAOSerie.serieName)),
+                        cursor.getString(cursor.getColumnIndex(DAOSerie.serieGenre)),
+                        cursor.getString(cursor.getColumnIndex(DAOSerie.serieOverview)),
+                        cursor.getString(cursor.getColumnIndex(DAOSerie.serieRating)),
+                        cursor.getString(cursor.getColumnIndex(DAOSerie.serieBanner))
+                );
+                series.add(serie);
             }
             cursor.close();
         }

@@ -1,6 +1,8 @@
 package com.example.root.tvapp.adapter;
 
 import android.content.Context;
+import android.graphics.Typeface;
+import android.support.v4.content.res.ResourcesCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,17 +42,15 @@ public class SerieAdapter extends ArrayAdapter<Serie> {
         TextView serieGenre = (TextView) convertView.findViewById(R.id.serie_genre);
 
         if(item.getRating() == null && item.getGenre() == null){
-            serieGenre.setVisibility(View.INVISIBLE);
-            serieGenre.setHeight(0);
-            serieRating.setVisibility(View.INVISIBLE);
-            serieRating.setHeight(0);
+            serieGenre.setVisibility(View.GONE);
+            serieRating.setVisibility(View.GONE);
             serieName.setText(item.getName());
             serieName.setGravity(Gravity.CENTER);
             serieName.setHeight(100);
         }else{
             serieName.setText(item.getName());
-            serieRating.setText(item.getRating());
-            serieGenre.setText(item.getGenre());
+            serieRating.setText(convertView.getResources().getText(R.string.rating) + item.getRating());
+            serieGenre.setText(convertView.getResources().getText(R.string.genre)  + item.getGenre());
         }
 
 

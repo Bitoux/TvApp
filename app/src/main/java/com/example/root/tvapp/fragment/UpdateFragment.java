@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -32,6 +33,10 @@ public class UpdateFragment extends Fragment {
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView seriesView;
+    private ArrayList<Serie> seriesList = new ArrayList<Serie>();
+    private int counter = 5;
+    private int[] seriesArrayID;
+    private FloatingActionButton refreshList;
 
 
     public UpdateFragment() {
@@ -43,31 +48,35 @@ public class UpdateFragment extends Fragment {
         // Inflate the layout for this fragment
         this.seriesView = (ListView) view.findViewById(R.id.update_series);
         this.swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
+        this.refreshList = (FloatingActionButton) view.findViewById(R.id.refresh_button);
 
         final APIServices apiServices = new APIServices(getActivity().getApplicationContext());
         if(isOnline()){
             apiServices.getUpdateSeries(new ISeriesIdListener() {
                 @Override
                 public void onSuccess(int[] seriesIDs) {
-                    final ArrayList<Serie> seriesList = new ArrayList<Serie>();
-                    for(int i = 0; i < 10 ; i++){
+                    seriesArrayID = seriesIDs;
+                    for(int i = 0; i < 5 ; i++){
                         apiServices.getSerieById(seriesIDs[i], new ISeriesListener() {
                             @Override
                             public void onSuccess(Serie serie) {
                                 seriesList.add(serie);
+
                                 SerieAdapter adapter = new SerieAdapter(getActivity().getApplicationContext(), seriesList);
 
                                 seriesView.setAdapter(adapter);
+
                             }
                         });
                     }
+
                 }
             });
         }else{
             DAOSerie daoSerie = new DAOSerie(getActivity().getApplicationContext());
             daoSerie.open();
-            Serie[] series = new Serie[20];
-            series = daoSerie.getLastSeries();
+            Serie[] series = new Serie[5];
+            series = daoSerie.getLastSeries(5);
             final ArrayList<Serie> seriesList = new ArrayList<Serie>();
             for(int i = 0; i < series.length; i++){
                 seriesList.add(series[i]);
@@ -76,12 +85,11 @@ public class UpdateFragment extends Fragment {
             seriesView.setAdapter(adapter);
         }
 
-
+        //ON LIST ITEN CLICK
         seriesView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Serie serie = (Serie) adapterView.getItemAtPosition(i);
-                System.out.println(serie.toString());
 
                 Intent intent =  new Intent(getActivity(), SerieActivity.class);
                 intent.putExtra("serieId", serie.getId());
@@ -89,6 +97,45 @@ public class UpdateFragment extends Fragment {
             }
         });
 
+        //ON FLOATING BUTTON CLICK
+        refreshList.setOnClickListener(new FloatingActionButton.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isOnline()){
+                    counter = counter + 5;
+                    for(int i = counter - 5; i < counter ; i++){
+                        apiServices.getSerieById(seriesArrayID[i], new ISeriesListener() {
+                            @Override
+                            public void onSuccess(Serie serie) {
+                                seriesList.add(serie);
+                                SerieAdapter adapter = new SerieAdapter(getActivity().getApplicationContext(), seriesList);
+
+                                seriesView.setAdapter(adapter);
+                                scrollMyListViewToBottom(adapter);
+                            }
+                        });
+                    }
+                }else{
+                    counter = counter + 5;
+                    DAOSerie daoSerie = new DAOSerie(getActivity().getApplicationContext());
+                    daoSerie.open();
+                    Serie[] series = daoSerie.getLastSeries(counter);
+                    final ArrayList<Serie> seriesList = new ArrayList<Serie>();
+                    for(int i = 0; i < series.length; i++){
+                        if(series[i] != null){
+                            seriesList.add(series[i]);
+                        }
+
+                    }
+                    SerieAdapter adapter = new SerieAdapter(getActivity().getApplicationContext(), seriesList);
+                    seriesView.setAdapter(adapter);
+                    scrollMyListViewToBottom(adapter);
+                }
+            }
+        });
+
+
+        //RERESH ON SWIPE
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -102,7 +149,7 @@ public class UpdateFragment extends Fragment {
                                     @Override
                                     public void onSuccess(Serie serie) {
                                         seriesList.add(serie);
-                                        SerieAdapter adapter = new SerieAdapter(getActivity().getApplicationContext(), seriesList);
+                                        SerieAdapter adapter = new SerieAdapter(getContext(), seriesList);
 
                                         seriesView.setAdapter(adapter);
                                     }
@@ -133,6 +180,16 @@ public class UpdateFragment extends Fragment {
                 getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return (networkInfo != null && networkInfo.isConnected());
+    }
+
+    private void scrollMyListViewToBottom(final SerieAdapter adapter) {
+        seriesView.post(new Runnable() {
+            @Override
+            public void run() {
+                // Select the last row so it will scroll into view...
+                seriesView.setSelection(adapter.getCount() - 1);
+            }
+        });
     }
 
 }

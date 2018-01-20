@@ -10,19 +10,19 @@
             android:icon="@drawable/ic_autorenew_black_24dp"
             android:id="@+id/nav_update"
             android:checked="true"
-            android:title="Series"/>
+            android:title="@string/series_menu"/>
         <item
             android:icon="@drawable/ic_magnify_black_24dp"
             android:id="@+id/nav_search"
-            android:title="Recherche"/>
+            android:title="@string/search_menu"/>
         <item
             android:icon="@drawable/ic_star_black_24dp"
             android:id="@+id/nav_favs"
-            android:title="Mes favoris"/>
+            android:title="@string/favs_menu"/>
         <item
             android:icon="@drawable/ic_account_black_24dp"
             android:id="@+id/nav_profile"
-            android:title="Mon profile"/>
+            android:title="@string/account_menu"/>
     </group>
 
 </menu>

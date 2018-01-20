@@ -36,12 +36,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     static final String userLanguage="UserLanguage";
     static final String userDisplayMode="UserDisplayMode";
 
+    //FAVORITES
+    static final String favTable="FavTable";
+    static final String favId="FavID";
+    static final String favSerieID="FavSerieID";
+
     public DatabaseHelper(Context context) {
         super(context, dbName, null, 1);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+
+        sqLiteDatabase.execSQL("CREATE TABLE " + favTable + " (" + favId + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            favSerieID + " INT)");
 
         sqLiteDatabase.execSQL("CREATE TABLE "+serieTable+" ("+serieId+ " INTEGER PRIMARY KEY , "+
                 serieName+ " TEXT, " + serieOverview + " TEXT, "  + serieRating + " TEXT, "  + serieGenre + " TEXT, " + serieBanner + " TEXT);");
@@ -51,7 +59,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             actorName + " TEXT, " + actorImg + " TEXT, " + actorRole + " TEXT, " + actorSerie + " INTEGER);" );
 
         sqLiteDatabase.execSQL("CREATE TABLE " + userTable + " (" + userId + " INTEGER PRIMARY KEY ,"+
-                userName + " TEXT, " + userLanguage + ", TEXT " + userDisplayMode + " TEXT);" );
+                userName + " TEXT , " + userLanguage + " , TEXT " + userDisplayMode + " TEXT);");
     }
 
     @Override

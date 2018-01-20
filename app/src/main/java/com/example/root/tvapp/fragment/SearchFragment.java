@@ -1,6 +1,9 @@
 package com.example.root.tvapp.fragment;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -16,6 +19,7 @@ import android.widget.ListView;
 import com.example.root.tvapp.R;
 import com.example.root.tvapp.activity.SerieActivity;
 import com.example.root.tvapp.adapter.SerieAdapter;
+import com.example.root.tvapp.database.DAOSerie;
 import com.example.root.tvapp.interfaces.ISeriesArrayListener;
 import com.example.root.tvapp.model.Serie;
 import com.example.root.tvapp.service.APIServices;
@@ -26,6 +30,10 @@ import java.util.ArrayList;
 public class SearchFragment extends Fragment {
 
     private static final String TAG = "SearchFragment";
+    private EditText serieName;
+    private Button searchBtn;
+    private ListView searchList;
+    private APIServices apiServices;
 
 
     public SearchFragment() {
@@ -34,13 +42,15 @@ public class SearchFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @NonNull Bundle savedInstanceState){
-        final EditText serieName = (EditText) view.findViewById(R.id.search_edit);
 
-        final Button searchBtn = (Button) view.findViewById(R.id.search_button);
+        this.serieName = (EditText) view.findViewById(R.id.search_edit);
 
-        final ListView searchList = (ListView) view.findViewById(R.id.search_list);
+        this.searchBtn = (Button) view.findViewById(R.id.search_button);
 
-        final APIServices apiServices = new APIServices(getActivity().getApplicationContext());
+
+        this.searchList = (ListView) view.findViewById(R.id.search_list);
+
+        this.apiServices = new APIServices(getActivity().getApplicationContext());
 
         searchBtn.setOnClickListener(new View.OnClickListener(){
 
@@ -48,18 +58,27 @@ public class SearchFragment extends Fragment {
             public void onClick(View v) {
                 Log.d(TAG, serieName.getText().toString());
                 if(serieName.getText().toString() != ""){
-                    final ArrayList<Serie> serieNameList = new ArrayList<Serie>();
-                    apiServices.searchSerieByName(serieName.getText().toString(), new ISeriesArrayListener() {
-                        @Override
-                        public void onSuccess(Serie[] series) {
-                            for (int i = 0; i < series.length; i++){
-                                serieNameList.add(series[i]);
-                                SerieAdapter adapter = new SerieAdapter(getActivity().getApplicationContext(), serieNameList);
+                    if(isOnline()){
+                        final ArrayList<Serie> serieNameList = new ArrayList<Serie>();
+                        apiServices.searchSerieByName(serieName.getText().toString(), new ISeriesArrayListener() {
+                            @Override
+                            public void onSuccess(Serie[] series) {
+                                for (int i = 0; i < series.length; i++){
+                                    serieNameList.add(series[i]);
+                                    SerieAdapter adapter = new SerieAdapter(getActivity().getApplicationContext(), serieNameList);
 
-                                searchList.setAdapter(adapter);
+                                    searchList.setAdapter(adapter);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }else{
+                        DAOSerie daoSerie = new DAOSerie(getContext());
+                        daoSerie.open();
+                        ArrayList<Serie> series = daoSerie.searhSerieByName(serieName.getText().toString());
+                        SerieAdapter adapter = new SerieAdapter(getContext(), series);
+                        searchList.setAdapter(adapter);
+                    }
+
                 }
             }
         });
@@ -81,6 +100,13 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_search, container, false);
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
     }
 
 }

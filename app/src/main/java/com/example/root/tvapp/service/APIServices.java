@@ -11,6 +11,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.root.tvapp.database.DAOActor;
+import com.example.root.tvapp.database.DAOFavorites;
 import com.example.root.tvapp.database.DAOSerie;
 import com.example.root.tvapp.interfaces.IActorArrayListener;
 import com.example.root.tvapp.interfaces.IBooleanListener;
@@ -53,7 +54,7 @@ public class APIServices {
         this.mContext = c;
     }
 
-    public void authentificate(final boolean memorise, String userkey, String username, final IStringListener callback){
+    public void authentificate(String userkey, String username, final IStringListener callback){
         String url = API_URL + "login";
 
         //PREPARE PARAMS
@@ -68,12 +69,11 @@ public class APIServices {
             public void onResponse(JSONObject response) {
                 // the response is already constructed as a JSONObject!
                 try {
-                    if(memorise){
-                        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
-                        SharedPreferences.Editor editor = settings.edit();
-                        editor.putString("TokenAPI", response.getString("token"));
-                        editor.commit();
-                    }
+                    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putString("TokenAPI", response.getString("token"));
+                    editor.commit();
+
                     callback.onSuccess(response.getString("token"));
 
                 } catch (JSONException e) {
@@ -84,6 +84,7 @@ public class APIServices {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                Log.d("VOLEY ERROR", "VOLLEY ERROR");
                 error.printStackTrace();
             }
         }) {
@@ -201,17 +202,18 @@ public class APIServices {
                 try{
                     JSONArray data = response.getJSONArray("data");
                     Actor[] actors = new Actor[data.length()];
-                    DAOActor daoActor = new DAOActor(mContext);
-                    daoActor.open();
                     for(int i = 0; i < data.length(); i++){
+                        DAOActor daoActor = new DAOActor(mContext);
+                        daoActor.open();
                         JSONObject tmpActor = data.getJSONObject(i);
                         Actor actor = new Actor(tmpActor.getInt("id"), tmpActor.getString("image"), tmpActor.getString("name"), tmpActor.getString("role"), tmpActor.getInt("seriesId"));
                         actors[i] = actor;
                         if(daoActor.selectActor(tmpActor.getInt("id")) == null){
-                            Log.d("NOT IN DB", "NOT IN DB");
+                            Log.d("ACTOR NOT IN DB", "NOT IN DB");
+                            Log.d("ACTOR NOT IN DB", actor.toString());
                             daoActor.addActor(actor);
                         }else{
-                            Log.d("IN DB", "IN DB");
+                            Log.d("ACTOR IN DB", "IN DB");
                         }
                     }
                     callback.onSuccess(actors);
@@ -285,11 +287,16 @@ public class APIServices {
             @Override
             public void onResponse(JSONObject response) {
                 try{
+                    DAOFavorites dao = new DAOFavorites(mContext);
+                    dao.open();
                     JSONObject data = response.getJSONObject("data");
                     Log.d(TAG, data.toString());
                     JSONArray favorites = data.getJSONArray("favorites");
                     int[] seriesIDs = new int[favorites.length()];
                     for(int i = 0 ; i < favorites.length() ; i++){
+                        if(!dao.checkFav(favorites.getInt(i))){
+                            dao.addFavorite(favorites.getInt(i));
+                        }
                         seriesIDs[i] = favorites.getInt(i);
                     }
                     callback.onSuccess(seriesIDs);
@@ -473,6 +480,7 @@ public class APIServices {
                     DAOSerie daoSerie = new DAOSerie(mContext);
                     daoSerie.open();
                     JSONObject data = response.getJSONObject("data");
+                    Log.d("FULL DATA", data.toString());
                     Long id = data.getLong("id");
                     String name = data.getString("seriesName");
                     String overview = data.getString("overview");
@@ -488,11 +496,11 @@ public class APIServices {
                         }
                     }
                     Serie serie = new Serie(id, name, genreString, overview, rating, banner);
+                    Log.d("NEWS SERIE", serie.toString());
                     if(daoSerie.selectSerie(id.intValue()) == null){
-                        Log.d("Not IN DB", "NOT IN DV");
                         daoSerie.addSerie(serie);
                     }else{
-                        Log.d("IN DB", "IN DB");
+                        daoSerie.editSerie(serie);
                     }
                     listener.onSuccess(serie);
                 } catch (JSONException e) {

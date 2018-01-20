@@ -1,71 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:fillViewport="true"
-    >
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:orientation="vertical"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.root.tvapp.activity.HomeActivity">
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/scrollSerie"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        >
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:elevation="4dp"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+            android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/banner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:scaleType="centerCrop" />
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                android:elevation="4dp"
+                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
-        <TextView
-            android:id="@+id/serie_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
+            <ImageView
+                android:id="@+id/banner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop" />
 
-        <TextView
-            android:id="@+id/serie_overview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
+            <TextView
+                android:id="@+id/serie_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:text="TextView"
+                android:textSize="18sp"/>
 
-        <TextView
-            android:id="@+id/serie_genre"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
+            <TextView
+                android:id="@+id/serie_overview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="20dp"
+                android:text="TextView" />
 
-        <TextView
-            android:id="@+id/serie_rating"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
+            <TextView
+                android:id="@+id/serie_genre"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
 
-        <Button
-            android:id="@+id/add_fav_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Ajouter aux Favoris" />
+            <TextView
+                android:id="@+id/serie_rating"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
 
-        <Button
-            android:id="@+id/del_fav"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="RETIRER DES FAVORIS" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
-        <ListView
-            android:id="@+id/actor_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/share_facabook"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|right"
+                    android:layout_margin="16dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_share_black_36dp"
+                    app:backgroundTint="@color/colorAccent"
+                    app:elevation="6dp"
+                    app:layout_anchor="@id/banner"
+                    app:layout_anchorGravity="top|right|end" />
 
-    </LinearLayout>
-</ScrollView>
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/add_fav_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|left"
+                    android:layout_margin="16dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_star_outline_black_36dp"
+                    app:backgroundTint="@color/colorAccent"
+                    app:elevation="6dp"
+                    app:layout_anchor="@id/actor_list"
+                    app:layout_anchorGravity="top|left|end" />
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/del_fav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|left"
+                    android:layout_margin="16dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_star_off_black_36dp"
+                    app:backgroundTint="@color/colorAccent"
+                    app:elevation="6dp"
+                    app:layout_anchor="@id/actor_list"
+                    app:layout_anchorGravity="top|left|end" />
+            </LinearLayout>
+
+
+            <ListView
+                android:id="@+id/actor_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+
+        </LinearLayout>
+
+    </ScrollView>
+</android.support.design.widget.CoordinatorLayout>

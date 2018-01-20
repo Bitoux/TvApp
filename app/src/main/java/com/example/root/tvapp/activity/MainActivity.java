@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
     private EditText userKey;
     private TextView errorText;
     private TextView errorOffline;
-    private CheckBox memoriseToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +38,19 @@ public class MainActivity extends AppCompatActivity {
         errorOffline = (TextView) findViewById(R.id.error_offilne);
 
         if(isOnline()){
-
-            Log.d("IS ONLINE", "IS ONELINE");
+            if(auth_token_string != null){
+                Log.d("MainActivity", "EVER AUTH");
+                APIServices apiServices = new APIServices(getApplicationContext());
+                apiServices.refreshToken( new IStringListener(){
+                    @Override
+                    public void onSuccess(String token) {
+                        //REDIRECT HOME ACTIVITY
+                        Intent myIntent = new Intent(MainActivity.this, HomeActivity.class);
+                        //myIntent.putExtra("key", value); //Optional parameters
+                        MainActivity.this.startActivity(myIntent);
+                    }
+                });
+            }
         }else{
 
             if(auth_token_string != null){
@@ -52,23 +62,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
-
-        if(auth_token_string != null){
-            Log.d("MainActivity", "EVER AUTH");
-            System.out.println("AZEAZE");
-            APIServices apiServices = new APIServices(getApplicationContext());
-            apiServices.refreshToken( new IStringListener(){
-                @Override
-                public void onSuccess(String token) {
-                    //REDIRECT HOME ACTIVITY
-                    Intent myIntent = new Intent(MainActivity.this, HomeActivity.class);
-                    //myIntent.putExtra("key", value); //Optional parameters
-                    MainActivity.this.startActivity(myIntent);
-                }
-            });
-        }
-
         Log.d("MainActivity", "NEVER AUTH");
 
         //GET VIEW ELEMENTS
@@ -76,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
         this.userName = (EditText) findViewById(R.id.username);
         this.userKey = (EditText) findViewById(R.id.userkey);
         this.errorText = (TextView) findViewById(R.id.errors);
-        this.memoriseToken = (CheckBox) findViewById(R.id.save_token);
 
         authBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -85,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     //GET TOKEN
                     APIServices apiServices = new APIServices(getApplicationContext());
-                    apiServices.authentificate(memoriseToken.isChecked(), userKey.getText().toString(), userName.getText().toString(), new IStringListener(){
+                    apiServices.authentificate(userKey.getText().toString(), userName.getText().toString(), new IStringListener(){
                         @Override
                         public void onSuccess(String token) {
                             //REDIRECT HOME ACTIVITY
@@ -103,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        Log.d("IS ONLINE", "IS ONELINE");
         return (networkInfo != null && networkInfo.isConnected());
     }
 }

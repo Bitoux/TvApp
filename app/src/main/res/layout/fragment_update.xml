@@ -28,6 +28,7 @@
         android:layout_gravity="bottom|right"
         android:layout_margin="16dp"
         android:src="@drawable/ic_autorenew_black_36dp"
+        app:backgroundTint="@color/colorAccent"
         app:elevation="6dp"
         app:layout_anchor="@id/update_series"
         app:layout_anchorGravity="bottom|right|end" />
